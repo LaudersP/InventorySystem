@@ -47,10 +47,19 @@ int main() {
 	int userInput;
 
 	int done = 0;
+	int error = 0;
 
 	do {
-		// Print graphics
+		// === Print graphics ===
 		PrintTitle();
+
+		// Print error if needed
+		if (error) {
+			const char* errorMessage = "INVALID INPUT!";
+
+			PrintError(errorMessage);
+		}
+
 		PrintMainMenu();
 
 		// Get desired input
@@ -58,14 +67,73 @@ int main() {
 
 		// Act on 'userInput'
 		switch (userInput) {
-		case 1:
+		case 1: {
 			// === Search Part === 
+			// Print graphics
+			PrintTitle();
+			PrintInputMessage("Enter Part ID");
+
+			// Data variable
+			char partId[7];
+
+			// SQL statement to select partId, partName, and quantity
+			const char* selectInventorySQL = "SELECT p.partId, p.partName, p.quantity, pi.manufacturer, pi.manufacturerNumber, pi.siteOrderedFrom, pi.partCost "
+				"FROM parts p "
+				"JOIN partsInfo pi ON p.partId = pi.partId "
+				"WHERE p.partId = ?;";
+
+			// SQLite statement handle for executing the SELECT query
+			sqlite3_stmt* stmt;
+
+			// Get desired part ID
+			printf("   Enter Part ID: ");
+			scanf("%s", partId);
+
+			// Prepare the SQL statement for execution
+			int rc = sqlite3_prepare_v2(db, selectInventorySQL, -1, &stmt, 0);
+
+			// Bind the partId as a parameter
+			sqlite3_bind_text(stmt, 1, partId, -1, SQLITE_STATIC);
+
+			// Execute the statement
+			while (sqlite3_step(stmt) == SQLITE_ROW) {
+				// Fetch the values from the current row
+				const char* id = (const char*)sqlite3_column_text(stmt, 0);
+
+				// Check if the retrieved partId matches the entered one
+				if (strcmp(id, partId) == 0) {
+					const char* name = (const char*)sqlite3_column_text(stmt, 1);
+					int qty = sqlite3_column_int(stmt, 2);
+					const char* man = (const char*)sqlite3_column_text(stmt, 3);
+					const char* manNum = (const char*)sqlite3_column_text(stmt, 4);
+					const char* site = (const char*)sqlite3_column_text(stmt, 5);
+					double unitCost = sqlite3_column_double(stmt, 6);
+
+					PrintPartInfo(id, name, man, manNum, site, qty, unitCost);
+				}
+			}
+
+			char input[2];
+
+			printf("\n RETURN TO MAIN MENU? (Y/N): ");
+			scanf("%s", input);
+
+			if (input[0] == 'n' || input[0] == 'N') {
+				done = 1;
+			}
+
+			// Finalize the statement
+			sqlite3_finalize(stmt);
+
+			error = 0;
+
 			break;
+		}
 		case 2:
 			// === Update Part === 
 			break;
 		case 3: {
-			// === Get Part Info ===
+			// === Add Part ===
 			char partId[7];
 			char partName[20];
 			int quantity = 0;
@@ -90,7 +158,6 @@ int main() {
 			printf("   Enter Part Cost: ");
 			scanf("%lf", &partCost);
 
-			// === Add Part ===
 			// SQL statement for inserting data into partsInfo table
 			const char* insertPartsInfoSQL = "INSERT INTO partsInfo (partId, manufacturer, manufacturerNumber, siteOrderedFrom, partCost) "
 				"VALUES (?, ?, ?, ?, ?);";
@@ -130,11 +197,13 @@ int main() {
 			rc = sqlite3_step(stmtParts);
 			sqlite3_finalize(stmtParts);
 
+			error = 0;
+
 			break;
 		}
-
 		case 4:
 			// === Remove Part === 
+
 			break;
 		case 5: {
 			// === View Inventory === 
@@ -168,12 +237,14 @@ int main() {
 
 			char input[2];
 
-			printf("\nRETURN TO MAIN MENU? (Y/N): ");
+			printf("\n RETURN TO MAIN MENU? (Y/N): ");
 			scanf("%s", input);
 
 			if (input[0] == 'n' || input[0] == 'N') {
 				done = 1;
 			}
+
+			error = 0;
 
 			break;
 		}
@@ -185,13 +256,7 @@ int main() {
 
 			break;
 		default: {
-			PrintTitle();
-
-			const char* errorMessage = "INVALID INPUT!";
-
-			PrintError(errorMessage);
-
-			PrintMainMenu();
+			error = 1;
 
 			break;
 		}
