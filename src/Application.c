@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdio.h> 
 #include <stdlib.h>
 #include <string.h>
@@ -5,8 +7,6 @@
 #include <menus.h>
 
 #define DATABASE_FILE_PATH "InventorySystem.db"
-
-void GetPartInfo(char** id, char** name, int* qty, char** man, char** manNum, char** site, char** url, double* unitCost);
 
 int main() {
 	// Pointer to inventory database file
@@ -37,50 +37,63 @@ int main() {
 		"	manufacturer TEXT,"
 		"	manufacturerNumber TEXT,"
 		"	siteOrderedFrom TEXT,"
-		"	link TEXT,"
 		"	partCost DECIMAL(4,2)"
 		");";
 
 	// Execute the SQL statement to create the table
 	rc = sqlite3_exec(db, createPartsInfoTableSQL, 0, 0, 0);
 
-	// ==== Table data variables ====
-	char* partId;
-	char* partName;
-	int quantity;
-	char* manufacturer;
-	char* manufacturerNumber;
-	char* siteOrderedFrom;
-	char* link;
-	double partCost;
-
 	// Variable to hold user input
 	int userInput;
 
-	// Print graphics
-	PrintTitle();
-	PrintMainMenu();
+	int done = 0;
 
 	do {
+		// Print graphics
+		PrintTitle();
+		PrintMainMenu();
+
 		// Get desired input
 		scanf_s("%d", &userInput);
 
 		// Act on 'userInput'
 		switch (userInput) {
-		case 1:	
+		case 1:
 			// === Search Part === 
 			break;
 		case 2:
 			// === Update Part === 
 			break;
 		case 3: {
-			// === Add Part ===  
-			// Assign values to data variables
-			GetPartInfo(&partId, &partName, &quantity, &manufacturer, &manufacturerNumber, &siteOrderedFrom, &link, &partCost);
-		
+			// === Get Part Info ===
+			char partId[7];
+			char partName[20];
+			int quantity = 0;
+			char manufacturer[20];
+			char manufacturerNumber[20];
+			char siteOrderedFrom[20];
+			double partCost = 0.00;
+
+			PrintInputMessage("Enter Part ID");
+			printf("   Enter Part ID: ");
+			scanf("%s", partId);
+			printf("   Enter Part Name: ");
+			scanf("%s", partName);
+			printf("   Enter Quantity: ");
+			scanf("%d", &quantity);
+			printf("   Enter Part Manufacturer: ");
+			scanf("%s", manufacturer);
+			printf("   Enter Manufacturer Part ID: ");
+			scanf("%s", manufacturerNumber);
+			printf("   Enter Site Ordered From: ");
+			scanf("%s", siteOrderedFrom);
+			printf("   Enter Part Cost: ");
+			scanf("%lf", &partCost);
+
+			// === Add Part ===
 			// SQL statement for inserting data into partsInfo table
-			const char* insertPartsInfoSQL = "INSERT INTO partsInfo (partId, manufacturer, manufacturerNumber, siteOrderedFrom, link, partCost) "
-				"VALUES (?, ?, ?, ?, ?, ?);";
+			const char* insertPartsInfoSQL = "INSERT INTO partsInfo (partId, manufacturer, manufacturerNumber, siteOrderedFrom, partCost) "
+				"VALUES (?, ?, ?, ?, ?);";
 
 			// SQL statement for inserting data into parts table
 			const char* insertPartsSQL = "INSERT INTO parts (partId, partName, quantity) VALUES (?, ?, ?);";
@@ -97,8 +110,7 @@ int main() {
 			sqlite3_bind_text(stmtInfo, 2, manufacturer, -1, SQLITE_STATIC);
 			sqlite3_bind_text(stmtInfo, 3, manufacturerNumber, -1, SQLITE_STATIC);
 			sqlite3_bind_text(stmtInfo, 4, siteOrderedFrom, -1, SQLITE_STATIC);
-			sqlite3_bind_text(stmtInfo, 5, link, -1, SQLITE_STATIC);
-			sqlite3_bind_double(stmtInfo, 6, partCost);
+			sqlite3_bind_double(stmtInfo, 5, partCost);
 
 			// Execute the 'partsInfo' insertion
 			rc = sqlite3_step(stmtInfo);
@@ -124,13 +136,53 @@ int main() {
 		case 4:
 			// === Remove Part === 
 			break;
-		case 5:
+		case 5: {
 			// === View Inventory === 
+			ClearTerminal();
+
+			// SQL statement to select partId, partName, and quantity
+			const char* selectInventorySQL = "SELECT p.partId, p.partName, p.quantity, pi.partCost "
+				"FROM parts p "
+				"JOIN partsInfo pi ON p.partId = pi.partId;";
+
+			// SQLite statement handle for executing the SELECT query
+			sqlite3_stmt* stmt;
+
+			// Prepare the SQL statement for execution
+			int rc = sqlite3_prepare_v2(db, selectInventorySQL, -1, &stmt, 0);
+
+			// Execute the SELECT query
+			while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+				// Fetch the values from the current row
+				const char* partId = (const char*)sqlite3_column_text(stmt, 0);
+				const char* partName = (const char*)sqlite3_column_text(stmt, 1);
+				int qty = sqlite3_column_int(stmt, 2);
+				double unitCost = sqlite3_column_double(stmt, 3);
+
+				// Display the information
+				printf("Part ID: %s,     Part Name: %s,     Quantity: %d,     Part Cost: $%.2lf,     Inventory Value: $%.2lf\n", partId, partName, qty, unitCost, qty * unitCost);
+			}
+
+			// Finalize the statement
+			sqlite3_finalize(stmt);
+
+			char input[2];
+
+			printf("\nRETURN TO MAIN MENU? (Y/N): ");
+			scanf("%s", input);
+
+			if (input[0] == 'n' || input[0] == 'N') {
+				done = 1;
+			}
+
 			break;
+		}
 		case 6:
 			// === Generate Report === 
 			break;
 		case 9:
+			done = 1;
+
 			break;
 		default: {
 			PrintTitle();
@@ -142,23 +194,11 @@ int main() {
 			PrintMainMenu();
 
 			break;
-		}	
 		}
-	} while (userInput != 9);
+		}
+	} while (!done);
 
 	sqlite3_close(db);
 
 	return 0;
-}
-
-// Function for getting part detail from user
-void GetPartInfo(char** id, char** name, int* qty, char** man, char** manNum, char** site, char** url, double* unitCost) {
-	*id = _strdup("P004");
-	*name = _strdup("SamplePart");
-	*qty = 10;
-	*man = _strdup("SampleManufacturer");
-	*manNum = _strdup("1234");
-	*site = _strdup("SampleSite");
-	*url = _strdup("https://samplelink.com");
-	*unitCost = 1.23;
 }
