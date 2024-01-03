@@ -148,3 +148,30 @@ void PrintError(const char* error) {
 		}
 	}
 }
+
+void PrintInputMessage(const char* inputMessage) {
+	ClearTerminal();
+
+	PrintTitle();
+	PrintFillerLine();
+
+	const char* tipMessaage = "TIP: DO NOT INCLUDE SPACES IN INPUTS!";
+
+	printf("%c   %s", 179, tipMessaage);
+
+	FinishLine(98 - (int)strlen(tipMessaage));
+
+	PrintFillerLine();
+
+	for (int i = 0; i < 103; i++) {
+		if (i == 0) {
+			printf("%c", 192);
+		}
+		else if (i == 102) {
+			printf("%c\n", 217);
+		}
+		else {
+			printf("%c", 196);
+		}
+	}
+}

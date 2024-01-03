@@ -11,5 +11,6 @@ void PrintMainMenu();
 void PrintFillerLine();
 void FinishLine(int length);
 void PrintError(const char* error);
+void PrintInputMessage(const char* inputMessage);
 
 #endif
