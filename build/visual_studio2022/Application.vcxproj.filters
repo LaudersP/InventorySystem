@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\Application.cpp">
+    <ClCompile Include="..\..\src\Application.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\dependencies\sqlite-amalgamation-3440200\shell.c">
@@ -24,6 +24,9 @@
     <ClCompile Include="..\..\dependencies\sqlite-amalgamation-3440200\sqlite3.c">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\menus.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dependencies\sqlite-amalgamation-3440200\sqlite3.h">
@@ -31,6 +34,9 @@
     </ClInclude>
     <ClInclude Include="..\..\dependencies\sqlite-amalgamation-3440200\sqlite3ext.h">
       <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\menus.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,9 +1,2 @@
-﻿  shell.c
-  sqlite3.c
-  Application.cpp
-LINK : warning LNK4067: ambiguous entry point; selected 'mainCRTStartup'
-  Generating code
-  Previous IPDB not found, fall back to full compilation.
-  All 2811 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
-  Finished generating code
-  Application.vcxproj -> C:\Users\Parker Lauders\Desktop\Engineering Projects\InventorySystem\bin\visual_studio2022\Release\Application.exe
+﻿  Application.c
+  Application.vcxproj -> C:\Users\Parker Lauders\Desktop\Engineering Projects\InventorySystem\bin\visual_studio2022\Debug\Application.exe

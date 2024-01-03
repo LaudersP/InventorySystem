@@ -21,11 +21,13 @@
   <ItemGroup>
     <ClCompile Include="..\..\dependencies\sqlite-amalgamation-3440200\shell.c" />
     <ClCompile Include="..\..\dependencies\sqlite-amalgamation-3440200\sqlite3.c" />
-    <ClCompile Include="..\..\src\Application.cpp" />
+    <ClCompile Include="..\..\src\Application.c" />
+    <ClCompile Include="..\..\src\menus.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dependencies\sqlite-amalgamation-3440200\sqlite3.h" />
     <ClInclude Include="..\..\dependencies\sqlite-amalgamation-3440200\sqlite3ext.h" />
+    <ClInclude Include="..\..\include\menus.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
