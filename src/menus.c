@@ -175,3 +175,73 @@ void PrintInputMessage(const char* inputMessage) {
 		}
 	}
 }
+
+void ConvertToUpperCase(char* str) {
+	for (int i = 0; i < strlen(str); i++) {
+		str[i] = toupper((unsigned char)str[i]);
+	}
+}
+
+void PrintPartInfo(const char* id, const char* name, const char* man, const char* manNum, const char* site, const int qty, const double unitCost) {
+	ClearTerminal();
+
+	PrintTitle();
+	PrintFillerLine();
+
+	// Convert strings to uppercase
+	char idUpper[100], nameUpper[100], manUpper[100], manNumUpper[100], siteUpper[100], qtyChar[100], unitCostChar[100], partValueChar[100];
+
+	strcpy_s(idUpper, sizeof(idUpper), id);
+	strcpy_s(nameUpper, sizeof(nameUpper), name);
+	strcpy_s(manUpper, sizeof(manUpper), man);
+	strcpy_s(manNumUpper, sizeof(manNumUpper), manNum);
+	strcpy_s(siteUpper, sizeof(siteUpper), site);
+
+	ConvertToUpperCase(idUpper);
+	ConvertToUpperCase(nameUpper);
+	ConvertToUpperCase(manUpper);
+	ConvertToUpperCase(manNumUpper);
+	ConvertToUpperCase(siteUpper);
+
+	printf("%c   PART ID: %s", 179, idUpper);
+	FinishLine(89 - (int)strlen(idUpper));
+
+	printf("%c   PART NAME: %s", 179, nameUpper);
+	FinishLine(87 - (int)strlen(nameUpper));
+
+	printf("%c   MANUFACTURER: %s", 179, manUpper);
+	FinishLine(84 - (int)strlen(manUpper));
+
+	printf("%c   MANUFACTURER ID: %s", 179, manNumUpper);
+	FinishLine(81 - (int)strlen(manNumUpper));
+
+	printf("%c   ORDERED FROM: %s", 179, siteUpper);
+	FinishLine(84 - (int)strlen(siteUpper));
+
+	sprintf_s(qtyChar, sizeof(qtyChar), "%d", (int)fabs(qty));
+	printf("%c   QUANTITY: %s", 179, qtyChar);
+	FinishLine(88 - (int)strlen(qtyChar));
+
+	sprintf_s(unitCostChar, sizeof(unitCostChar), "%.2f", fabs(unitCost));
+	printf("%c   PART COST: %s", 179, unitCostChar);
+	FinishLine(88 - (int)strlen(unitCostChar) - 1);
+
+	double partValue = qty * unitCost;
+	sprintf_s(partValueChar, sizeof(partValueChar), "%.2f", fabs(partValue));
+	printf("%c   PART COST: %s", 179, partValueChar);
+	FinishLine(88 - (int)strlen(partValueChar) - 1);
+
+	PrintFillerLine();
+
+	for (int i = 0; i < 103; i++) {
+		if (i == 0) {
+			printf("%c", 192);
+		}
+		else if (i == 102) {
+			printf("%c\n", 217);
+		}
+		else {
+			printf("%c", 196);
+		}
+	}
+}
