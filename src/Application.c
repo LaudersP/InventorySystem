@@ -49,15 +49,15 @@ int main() {
 	int done = 0;
 	int error = 0;
 
+	const char* errorMessage = "";
+
 	do {
 		// === Print graphics ===
 		PrintTitle();
 
 		// Print error if needed
 		if (error) {
-			const char* errorMessage = "INVALID INPUT!";
-
-			PrintError(errorMessage);
+			PrintBannerMessage(errorMessage);
 		}
 
 		PrintMainMenu();
@@ -71,10 +71,14 @@ int main() {
 			// === Search Part === 
 			// Print graphics
 			PrintTitle();
-			PrintInputMessage("Enter Part ID");
+			PrintMessage("Enter Part ID");
 
 			// Data variable
 			char partId[7];
+
+			// Get desired part ID
+			printf(" >> ");
+			scanf("%s", partId);
 
 			// SQL statement to select partId, partName, and quantity
 			const char* selectInventorySQL = "SELECT p.partId, p.partName, p.quantity, pi.manufacturer, pi.manufacturerNumber, pi.siteOrderedFrom, pi.partCost "
@@ -84,10 +88,6 @@ int main() {
 
 			// SQLite statement handle for executing the SELECT query
 			sqlite3_stmt* stmt;
-
-			// Get desired part ID
-			printf("   Enter Part ID: ");
-			scanf("%s", partId);
 
 			// Prepare the SQL statement for execution
 			int rc = sqlite3_prepare_v2(db, selectInventorySQL, -1, &stmt, 0);
@@ -142,9 +142,42 @@ int main() {
 			char siteOrderedFrom[20];
 			double partCost = 0.00;
 
-			PrintInputMessage("Enter Part ID");
+			PrintMessage("ADD PART");
+
 			printf("   Enter Part ID: ");
 			scanf("%s", partId);
+
+			// SQL statement to check if partId exists
+			const char* checkPartIdSQL = "SELECT 1 "
+				"FROM parts "
+				"WHERE partId = ? "
+				"LIMIT 1;";
+
+			// SQLite statement handle for executing the SELECT query
+			sqlite3_stmt* checkStmt;
+
+			// Prepare the SQL statement for checking partId existence
+			rc = sqlite3_prepare_v2(db, checkPartIdSQL, -1, &checkStmt, 0);
+
+			// Bind the partId as a parameter
+			sqlite3_bind_text(checkStmt, 1, partId, -1, SQLITE_STATIC);
+
+			// Execute the check statement
+			if (sqlite3_step(checkStmt) == SQLITE_ROW) {
+				error = 1;
+
+				// partId alread exists
+				errorMessage = "ERROR) PART ID ALREADY EXISTS!";
+
+				// Finalize the check statement
+				sqlite3_finalize(checkStmt);
+
+				break;
+			}
+
+			// Finalize the check statement
+			sqlite3_finalize(checkStmt);
+
 			printf("   Enter Part Name: ");
 			scanf("%s", partName);
 			printf("   Enter Quantity: ");
@@ -207,7 +240,9 @@ int main() {
 			break;
 		case 5: {
 			// === View Inventory === 
-			ClearTerminal();
+			PrintClearTerminal();
+			PrintTitle();
+			PrintBannerMessage("INVENTORY");
 
 			// SQL statement to select partId, partName, and quantity
 			const char* selectInventorySQL = "SELECT p.partId, p.partName, p.quantity, pi.partCost "
@@ -229,8 +264,11 @@ int main() {
 				double unitCost = sqlite3_column_double(stmt, 3);
 
 				// Display the information
-				printf("Part ID: %s,     Part Name: %s,     Quantity: %d,     Part Cost: $%.2lf,     Inventory Value: $%.2lf\n", partId, partName, qty, unitCost, qty * unitCost);
+				//printf("Part ID: %s,     Part Name: %s,     Quantity: %d,     Part Cost: $%.2lf,     Inventory Value: $%.2lf\n", partId, partName, qty, unitCost, qty * unitCost);
+				PrintInventory(partId, partName, qty);
 			}
+
+			GraphicBottom();
 
 			// Finalize the statement
 			sqlite3_finalize(stmt);
@@ -257,6 +295,8 @@ int main() {
 			break;
 		default: {
 			error = 1;
+
+			errorMessage = "INVALID INPUT!";
 
 			break;
 		}
