@@ -1,7 +1,8 @@
 ﻿#include <menus.h>
 
+// === Main Print Functions
 // Function to clear the terminal
-void ClearTerminal() {
+void PrintClearTerminal() {
 #ifdef _WIN32 // For Windows
 	system("cls");
 #else // Assuming Unix-like system
@@ -9,8 +10,9 @@ void ClearTerminal() {
 #endif
 }
 
+// Function to print title
 void PrintTitle() {
-	ClearTerminal();
+	PrintClearTerminal();
 
 	printf("%c", 218);
 
@@ -54,8 +56,9 @@ void PrintTitle() {
 	printf("%c\n", 180);
 }
 
+// Function to print the main menu
 void PrintMainMenu() {
-	PrintFillerLine();
+	FillerLine();
 
 	printf("%c   (1) SEARCH PART    ", 179);
 
@@ -85,56 +88,18 @@ void PrintMainMenu() {
 
 	FinishLine(79);
 
-	PrintFillerLine();
+	FillerLine();
 
-	for (int i = 0; i < 103; i++) {
-		if (i == 0) {
-			printf("%c", 192);
-		}
-		else if (i == 102) {
-			printf("%c", 217);
-		}
-		else {
-			printf("%c", 196);
-		}
-	}
+	GraphicBottom();
 
 	printf("\n >> ");
 }
 
-void PrintFillerLine() {
-	for (int i = 0; i < 103; i++) {
-		if (i == 0) {
-			printf("%c", 179);
-		}
-		else if (i == 102) {
-			printf("%c\n", 179);
-		}
-		else {
-			printf(" ");
-		}
-	}
-}
+// Function to print a message banner
+void PrintBannerMessage(const char* bannerMessage) {
+	printf("%c   %s", 179, bannerMessage);
 
-void FinishLine(int length) {
-	for (int i = 0; i < length + 1; i++) {
-		if (i == length) {
-			printf("%c\n", 179);
-		}
-		else {
-			printf(" ");
-		}
-	}
-}
-
-void PrintError(const char* error) {
-	printf("%c   ERROR) ", 179);
-
-	size_t errorLength = strlen(error);
-
-	printf("%s", error);
-
-	FinishLine(91 - (int)errorLength);
+	FinishLine(98 - (int)strlen(bannerMessage));
 
 	for (int i = 0; i < 103; i++) {
 		if (i == 0) {
@@ -149,26 +114,77 @@ void PrintError(const char* error) {
 	}
 }
 
-void PrintInputMessage(const char* inputMessage) {
-	ClearTerminal();
+// Function to print input message
+void PrintMessage(const char* inputMessage) {
+	PrintClearTerminal();
 
 	PrintTitle();
-	PrintFillerLine();
 
 	const char* tipMessaage = "TIP: DO NOT INCLUDE SPACES IN INPUTS!";
 
-	printf("%c   %s", 179, tipMessaage);
+	PrintBannerMessage(tipMessaage);
 
-	FinishLine(98 - (int)strlen(tipMessaage));
+	FillerLine();
 
-	PrintFillerLine();
+	printf("%c   %s", 179, inputMessage);
+
+	FinishLine(98 - (int)strlen(inputMessage));
+
+	FillerLine();
+
+	GraphicBottom();
+}
+
+// Function to print inventory
+void PrintInventory(const char* id, const char* name, const int qty) {
+	printf("%c%c", 179, 218);
+
+	for (int i = 0; i < 99; i++) {
+		printf("%c", 196);
+	}
+
+	printf("%c%c\n", 191, 179);
+
+	printf("%c%c   PART ID: %s", 179, 179, id);
+	
+	for (int i = 0; i < 87 - (int)strlen(id); i++) {
+		printf(" ");
+	}
+
+	printf("%c%c\n", 179, 179);
+
+	printf("%c%c   PART NAME: %s", 179, 179, name);
+
+	for (int i = 0; i < 85 - (int)strlen(name); i++) {
+		printf(" ");
+	}
+
+	printf("%c%c\n", 179, 179);
+
+	char qtyChar[20];
+
+	sprintf_s(qtyChar, sizeof(qtyChar), "%d", (int)fabs(qty));
+
+	printf("%c%c   QUANTITY: %s", 179, 179, qtyChar);
+
+	for (int i = 0; i < 86 - (int)strlen(qtyChar); i++) {
+		printf(" ");
+	}
+
+	printf("%c%c\n", 179, 179);
 
 	for (int i = 0; i < 103; i++) {
 		if (i == 0) {
+			printf("%c", 179);
+		}
+		else if (i == 1) {
 			printf("%c", 192);
 		}
+		else if (i == 101) {
+			printf("%c", 217);
+		}
 		else if (i == 102) {
-			printf("%c\n", 217);
+			printf("%c\n", 179);
 		}
 		else {
 			printf("%c", 196);
@@ -176,17 +192,15 @@ void PrintInputMessage(const char* inputMessage) {
 	}
 }
 
-void ConvertToUpperCase(char* str) {
-	for (int i = 0; i < strlen(str); i++) {
-		str[i] = toupper((unsigned char)str[i]);
-	}
-}
-
+// Functio to print part info
 void PrintPartInfo(const char* id, const char* name, const char* man, const char* manNum, const char* site, const int qty, const double unitCost) {
-	ClearTerminal();
+	PrintClearTerminal();
 
 	PrintTitle();
-	PrintFillerLine();
+
+	PrintBannerMessage("PART INFO");
+
+	FillerLine();
 
 	// Convert strings to uppercase
 	char idUpper[100], nameUpper[100], manUpper[100], manNumUpper[100], siteUpper[100], qtyChar[100], unitCostChar[100], partValueChar[100];
@@ -231,7 +245,7 @@ void PrintPartInfo(const char* id, const char* name, const char* man, const char
 	printf("%c   PART COST: %s", 179, partValueChar);
 	FinishLine(88 - (int)strlen(partValueChar) - 1);
 
-	PrintFillerLine();
+	FillerLine();
 
 	for (int i = 0; i < 103; i++) {
 		if (i == 0) {
@@ -243,5 +257,55 @@ void PrintPartInfo(const char* id, const char* name, const char* man, const char
 		else {
 			printf("%c", 196);
 		}
+	}
+}
+
+// === Sub Called Functions ===
+// Function to output a blank line
+void FillerLine() {
+	for (int i = 0; i < 103; i++) {
+		if (i == 0) {
+			printf("%c", 179);
+		}
+		else if (i == 102) {
+			printf("%c\n", 179);
+		}
+		else {
+			printf(" ");
+		}
+	}
+}
+
+// Function to print the bottom of graphic section
+void GraphicBottom() {
+	for (int i = 0; i < 103; i++) {
+		if (i == 0) {
+			printf("%c", 192);
+		}
+		else if (i == 102) {
+			printf("%c\n", 217);
+		}
+		else {
+			printf("%c", 196);
+		}
+	}
+}
+
+// Function to end the line
+void FinishLine(int length) {
+	for (int i = 0; i < length + 1; i++) {
+		if (i == length) {
+			printf("%c\n", 179);
+		}
+		else {
+			printf(" ");
+		}
+	}
+}
+
+// Function to upper case a char
+void ConvertToUpperCase(char* str) {
+	for (int i = 0; i < strlen(str); i++) {
+		str[i] = toupper((unsigned char)str[i]);
 	}
 }

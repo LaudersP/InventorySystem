@@ -7,14 +7,19 @@
 #include <ctype.h>
 #include <math.h>
 
-void ClearTerminal();
+// === Main Print Functions ===
+void PrintClearTerminal();
 void PrintTitle();
 void PrintMainMenu();
-void PrintFillerLine();
-void FinishLine(int length);
-void PrintError(const char* error);
-void PrintInputMessage(const char* inputMessage);
-void ConvertToUpperCase(char* str);
+void PrintBannerMessage(const char* bannerMessage);
+void PrintMessage(const char* inputMessage);
+void PrintInventory(const char* id, const char* name, const int qty);
 void PrintPartInfo(const char* id, const char* name, const char* man, const char* manNum, const char* site, const int qty, const double unitCost);
+
+// === Sub Called Functions ===
+void FillerLine();
+void GraphicBottom();
+void FinishLine(int length);
+void ConvertToUpperCase(char* str);
 
 #endif
