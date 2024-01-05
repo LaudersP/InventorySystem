@@ -116,14 +116,6 @@ void PrintBannerMessage(const char* bannerMessage) {
 
 // Function to print input message
 void PrintMessage(const char* inputMessage) {
-	PrintClearTerminal();
-
-	PrintTitle();
-
-	const char* tipMessaage = "TIP: DO NOT INCLUDE SPACES IN INPUTS!";
-
-	PrintBannerMessage(tipMessaage);
-
 	FillerLine();
 
 	printf("%c   %s", 179, inputMessage);
@@ -242,8 +234,8 @@ void PrintPartInfo(const char* id, const char* name, const char* man, const char
 
 	double partValue = qty * unitCost;
 	sprintf_s(partValueChar, sizeof(partValueChar), "%.2f", fabs(partValue));
-	printf("%c   PART COST: %s", 179, partValueChar);
-	FinishLine(88 - (int)strlen(partValueChar) - 1);
+	printf("%c   PART VALUE: %s", 179, partValueChar);
+	FinishLine(87 - (int)strlen(partValueChar) - 1);
 
 	FillerLine();
 
