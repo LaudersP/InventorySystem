@@ -71,6 +71,7 @@ int main() {
 			// === Search Part === 
 			// Print graphics
 			PrintTitle();
+			PrintBannerMessage("TIP: DO NOT INCLUDE SPACES IN INPUTS!");
 			PrintMessage("Enter Part ID");
 
 			// Data variable
@@ -113,6 +114,9 @@ int main() {
 				}
 			}
 
+			// Finalize the statement
+			sqlite3_finalize(stmt);
+
 			char input[2];
 
 			printf("\n RETURN TO MAIN MENU? (Y/N): ");
@@ -121,9 +125,6 @@ int main() {
 			if (input[0] == 'n' || input[0] == 'N') {
 				done = 1;
 			}
-
-			// Finalize the statement
-			sqlite3_finalize(stmt);
 
 			error = 0;
 
@@ -142,6 +143,8 @@ int main() {
 			char siteOrderedFrom[20];
 			double partCost = 0.00;
 
+			PrintTitle();
+			PrintBannerMessage("TIP: DO NOT INCLUDE SPACES IN INPUTS!");
 			PrintMessage("ADD PART");
 
 			printf("   Enter Part ID: ");
@@ -234,10 +237,105 @@ int main() {
 
 			break;
 		}
-		case 4:
+		case 4: {
 			// === Remove Part === 
+			PrintClearTerminal();
+			PrintTitle();
+			PrintBannerMessage("REMOVE PART");
+			PrintMessage("Enter Part ID");
+
+			// Data variable
+			char partId[7];
+
+			// Get desired part ID
+			printf(" >> ");
+			scanf("%s", partId);
+
+			// SQL statement to select partId, partName, and quantity
+			const char* selectInventorySQL = "SELECT p.partId, p.partName, p.quantity, pi.manufacturer, pi.manufacturerNumber, pi.siteOrderedFrom, pi.partCost "
+				"FROM parts p "
+				"JOIN partsInfo pi ON p.partId = pi.partId "
+				"WHERE p.partId = ?;";
+
+			// SQLite statement handle for executing the SELECT query
+			sqlite3_stmt* stmt;
+
+			// Prepare the SQL statement for execution
+			int rc = sqlite3_prepare_v2(db, selectInventorySQL, -1, &stmt, 0);
+
+			// Bind the partId as a parameter
+			sqlite3_bind_text(stmt, 1, partId, -1, SQLITE_STATIC);
+
+			// Execute the statement
+			while (sqlite3_step(stmt) == SQLITE_ROW) {
+				// Fetch the values from the current row
+				const char* id = (const char*)sqlite3_column_text(stmt, 0);
+
+				// Check if the retrieved partId matches the entered one
+				if (strcmp(id, partId) == 0) {
+					const char* name = (const char*)sqlite3_column_text(stmt, 1);
+					int qty = sqlite3_column_int(stmt, 2);
+					const char* man = (const char*)sqlite3_column_text(stmt, 3);
+					const char* manNum = (const char*)sqlite3_column_text(stmt, 4);
+					const char* site = (const char*)sqlite3_column_text(stmt, 5);
+					double unitCost = sqlite3_column_double(stmt, 6);
+
+					PrintPartInfo(id, name, man, manNum, site, qty, unitCost);
+				}
+			}
+
+			// Finalize the statement
+			sqlite3_finalize(stmt);
+
+			char input[2];
+
+			printf("\n ARE YOU SURE? (Y/N): ");
+			scanf("%s", input);
+
+			if (input[0] == 'n' || input[0] == 'N') {
+				break;
+			}
+
+			// SQL statement to remove desired part from parts
+			const char* removePart = "DELETE FROM parts "
+				"WHERE partId = ?;";
+
+			// SQL statement to remove desired part from partInfo
+			const char* removePartInfo = "DELETE FROM partsInfo "
+				"WHERE partId = ?;";
+
+			// SQLite statement handle for executing the REMOVE query
+			sqlite3_stmt* stmtPart;
+			sqlite3_stmt* stmtPartInfo;
+
+			// Prepare the SQL statement for execution
+			rc = sqlite3_prepare_v2(db, removePart, -1, &stmtPart, 0);
+
+			// Bind the partId as a parameter
+			sqlite3_bind_text(stmtPart, 1, partId, -1, SQLITE_STATIC);
+
+			// Execute the statement
+			rc = sqlite3_step(stmtPart);
+
+			// Finalize the statement
+			sqlite3_finalize(stmtPart);
+
+			// Prepare the SQL statement for execution
+			rc = sqlite3_prepare_v2(db, removePartInfo, -1, &stmtPartInfo, 0);
+
+			// Bind the partId as a parameter
+			sqlite3_bind_text(stmtPartInfo, 1, partId, -1, SQLITE_STATIC);
+
+			// Execute the statement
+			rc = sqlite3_step(stmtPart);
+
+			// Finalize the statement
+			sqlite3_finalize(stmtPartInfo);
+
+			error = 0;
 
 			break;
+		}
 		case 5: {
 			// === View Inventory === 
 			PrintClearTerminal();
@@ -247,7 +345,8 @@ int main() {
 			// SQL statement to select partId, partName, and quantity
 			const char* selectInventorySQL = "SELECT p.partId, p.partName, p.quantity, pi.partCost "
 				"FROM parts p "
-				"JOIN partsInfo pi ON p.partId = pi.partId;";
+				"JOIN partsInfo pi ON p.partId = pi.partId "
+				"ORDER BY p.partId ";
 
 			// SQLite statement handle for executing the SELECT query
 			sqlite3_stmt* stmt;
