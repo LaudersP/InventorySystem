@@ -72,7 +72,7 @@ int main() {
 			// Print graphics
 			PrintTitle();
 			PrintBannerMessage("TIP: DO NOT INCLUDE SPACES IN INPUTS!");
-			PrintMessage("Enter Part ID");
+			PrintMessage("ENTER PART ID");
 
 			// Data variable
 			char partId[7];
@@ -130,9 +130,609 @@ int main() {
 
 			break;
 		}
-		case 2:
-			// === Update Part === 
+		case 2: {
+			// === Update Part ===
+			int partExists = -1;
+			char partIdChar[7];
+
+			// Check partId works
+			do {
+				PrintTitle();
+
+				if (!partExists) {
+					PrintBannerMessage("ERROR) PART DOES NOT EXIST!");
+				}
+
+				PrintBannerMessage("UPDATE PART");
+				PrintMessage("PART TO UPDATE");
+
+				printf(" >> ");
+				scanf("%s", partIdChar);
+
+				// SQL statement to check if partId exists
+				const char* checkPartSQL = "SELECT 1 "
+					"FROM parts "
+					"WHERE partId = ? "
+					"LIMIT 1;";
+
+				// SQLite statement handle for executing the SELECT query
+				sqlite3_stmt* checkStmt;
+
+				// Prepare the SQL statement for checking partId existence
+				int rc = sqlite3_prepare_v2(db, checkPartSQL, -1, &checkStmt, 0);
+
+				// Bind the partId as a parameter
+				sqlite3_bind_text(checkStmt, 1, partIdChar, -1, SQLITE_STATIC);
+
+				// Execute the check statement
+				if (sqlite3_step(checkStmt) == SQLITE_ROW) {
+					partExists = 1;
+				}
+				else {
+					partExists = 0;
+				}
+
+				// Finalize the check statement
+				sqlite3_finalize(checkStmt);
+			} while (partExists == 0);
+
+			// Get update option
+			int input = -1;
+			do {
+				PrintTitle();
+
+				if ((input < 1 || input > 2) && input != -1) {
+					PrintBannerMessage("ERROR) INVALID OPTION!");
+				}
+
+				PrintBannerMessage("UPDATE PART");
+				PrintUpdateMenu();
+
+				printf(" >> ");
+				scanf("%d", &input);
+			} while (input < 1 || input > 2);
+
+			// Act on option
+			switch (input) {
+			case 1: {
+				// === Part Info ===
+				input = -1;
+
+				// Get option
+				do {
+					PrintTitle();
+
+					if ((input < 1 || input > 5) && input != -1) {
+						PrintBannerMessage("ERROR) INVALID INPUT!");
+					}
+
+					PrintUpdatePartInfoMenu();
+
+					printf(" >> ");
+					scanf("%d", &input);
+				} while (input < 1 || input > 2);
+
+				// Act on option
+				switch (input) {
+				case 1: {
+					// === Update Part Name ===
+					PrintTitle();
+					PrintBannerMessage("TIP: DO NOT INCLUDE SPACES IN INPUTS!");
+					PrintMessage("ENTER NEW PART NAME");
+
+					char partName[20];
+
+					printf(" >> ");
+					scanf("%s", partName);
+
+					// Get old part name
+					const char* nameSQL = "SELECT partId, partName "
+						"FROM parts "
+						"WHERE partId = ?;";
+
+					// SQLite statement handle for executing the SELECT query
+					sqlite3_stmt* stmt;
+
+					// Prepare the SQL statement for execution
+					int rc = sqlite3_prepare_v2(db, nameSQL, -1, &stmt, 0);
+
+					// Bind the partId as a parameter
+					sqlite3_bind_text(stmt, 1, partIdChar, -1, SQLITE_STATIC);
+
+					char name[20] = "";
+
+					// Execute the statement
+					while (sqlite3_step(stmt) == SQLITE_ROW) {
+						// Fetch the values from the current row
+						const char* id = (const char*)sqlite3_column_text(stmt, 0);
+
+						// Check if the retrieved partId matches the entered one
+						if (strcmp(id, partIdChar) == 0) {
+							const char* retrievedName = (const char*)sqlite3_column_text(stmt, 1);
+
+							// Copy the retrieved name to 'name'
+							strncpy(name, retrievedName, 19);
+							name[19] = '\0';
+						}
+					}
+
+					// Finalize the statement
+					sqlite3_finalize(stmt);
+
+					// Ask user for confirmation
+					PrintUpdateConfirm("PART NAME", name, partName);
+
+					printf(" CONFIRM (Y/N): ");
+
+					char input[2];
+					scanf("%s", input);
+
+					if (input[0] == 'y' || input[0] == 'Y') {
+						// SQL statement for updating partName
+						const char* updateNameSQL = "UPDATE parts "
+							"SET partName = ?"
+							"WHERE partId = ?;";
+
+						// SQLite statement handle for executing the SELECT query
+						sqlite3_stmt* stmt;
+
+						// Prepare the SQL statement for execution
+						int rc = sqlite3_prepare_v2(db, updateNameSQL, -1, &stmt, 0);
+
+						// Bind the partId as a parameter
+						sqlite3_bind_text(stmt, 1, partName, -1, SQLITE_STATIC);
+						sqlite3_bind_text(stmt, 2, partIdChar, -1, SQLITE_STATIC);
+
+						// Execute the statement
+						rc = sqlite3_step(stmt);
+
+						// Finalize the statement
+						sqlite3_finalize(stmt);
+					}
+
+					break;
+				}
+				case 2: {
+					// === Update Manufacturer ===
+					PrintTitle();
+					PrintBannerMessage("TIP: DO NOT INCLUDE SPACES IN INPUTS!");
+					PrintMessage("ENTER NEW MANUFACTURER");
+
+					char partManufacturer[20];
+
+					printf(" >> ");
+					scanf("%s", partManufacturer);
+
+					// Get old part manufacturer
+					const char* manufacturerSQL = "SELECT partId, manufacturer "
+						"FROM partsInfo "
+						"WHERE partId = ?;";
+
+					// SQLite statement handle for executing the SELECT query
+					sqlite3_stmt* stmt;
+
+					// Prepare the SQL statement for execution
+					int rc = sqlite3_prepare_v2(db, manufacturerSQL, -1, &stmt, 0);
+
+					// Bind the partId as a parameter
+					sqlite3_bind_text(stmt, 1, partIdChar, -1, SQLITE_STATIC);
+
+					char manufacturer[20] = "";
+
+					// Execute the statement
+					while (sqlite3_step(stmt) == SQLITE_ROW) {
+						// Fetch the values from the current row
+						const char* id = (const char*)sqlite3_column_text(stmt, 0);
+
+						// Check if the retrieved partId matches the entered one
+						if (strcmp(id, partIdChar) == 0) {
+							const char* retrievedManufacturer = (const char*)sqlite3_column_text(stmt, 1);
+
+							// Copy the retrieved name to 'manufacturer'
+							strncpy(manufacturer, retrievedManufacturer, 19);
+							manufacturer[19] = '\0';
+						}
+					}
+
+					// Finalize the statement
+					sqlite3_finalize(stmt);
+
+					// Ask user for confirmation
+					PrintUpdateConfirm("MANUFACTURER", manufacturer, partManufacturer);
+
+					printf(" CONFIRM (Y/N): ");
+
+					char input[2];
+					scanf("%s", input);
+
+					if (input[0] == 'y' || input[0] == 'Y') {
+						// SQL statement for updating manufacturer
+						const char* updateNameSQL = "UPDATE partsInfo "
+							"SET manufacturer = ?"
+							"WHERE partId = ?;";
+
+						// SQLite statement handle for executing the SELECT query
+						sqlite3_stmt* stmt;
+
+						// Prepare the SQL statement for execution
+						int rc = sqlite3_prepare_v2(db, updateNameSQL, -1, &stmt, 0);
+
+						// Bind the partId as a parameter
+						sqlite3_bind_text(stmt, 1, partManufacturer, -1, SQLITE_STATIC);
+						sqlite3_bind_text(stmt, 2, partIdChar, -1, SQLITE_STATIC);
+
+						// Execute the statement
+						rc = sqlite3_step(stmt);
+
+						// Finalize the statement
+						sqlite3_finalize(stmt);
+					}
+
+					break;
+				}
+				case 3: {
+					// === Update Manufacturer ID ===
+					PrintTitle();
+					PrintBannerMessage("TIP: DO NOT INCLUDE SPACES IN INPUTS!");
+					PrintMessage("ENTER NEW MANUFACTURER ID");
+
+					char partManufacturerID[20];
+
+					printf(" >> ");
+					scanf("%s", partManufacturerID);
+
+					// Get old part manufacturer ID
+					const char* manufacturerIdSQL = "SELECT partId, manufacturerNumber "
+						"FROM partsInfo "
+						"WHERE partId = ?;";
+
+					// SQLite statement handle for executing the SELECT query
+					sqlite3_stmt* stmt;
+
+					// Prepare the SQL statement for execution
+					int rc = sqlite3_prepare_v2(db, manufacturerIdSQL, -1, &stmt, 0);
+
+					// Bind the partId as a parameter
+					sqlite3_bind_text(stmt, 1, partIdChar, -1, SQLITE_STATIC);
+
+					char manufacturerId[20] = "";
+
+					// Execute the statement
+					while (sqlite3_step(stmt) == SQLITE_ROW) {
+						// Fetch the values from the current row
+						const char* id = (const char*)sqlite3_column_text(stmt, 0);
+
+						// Check if the retrieved partId matches the entered one
+						if (strcmp(id, partIdChar) == 0) {
+							const char* retrievedManufacturerId = (const char*)sqlite3_column_text(stmt, 1);
+
+							// Copy the retrieved name to 'manufacturerId'
+							strncpy(manufacturerId, retrievedManufacturerId, 19);
+							manufacturerId[19] = '\0';
+						}
+					}
+
+					// Finalize the statement
+					sqlite3_finalize(stmt);
+
+					// Ask user for confirmation
+					PrintUpdateConfirm("MANUFACTURER ID", manufacturerId, partManufacturerID);
+
+					printf(" CONFIRM (Y/N): ");
+
+					char input[2];
+					scanf("%s", input);
+
+					if (input[0] == 'y' || input[0] == 'Y') {
+						// SQL statement for updating manufacturerNumber
+						const char* updateNameSQL = "UPDATE partsInfo "
+							"SET manufacturerNumber = ?"
+							"WHERE partId = ?;";
+
+						// SQLite statement handle for executing the SELECT query
+						sqlite3_stmt* stmt;
+
+						// Prepare the SQL statement for execution
+						int rc = sqlite3_prepare_v2(db, updateNameSQL, -1, &stmt, 0);
+
+						// Bind the partId as a parameter
+						sqlite3_bind_text(stmt, 1, partManufacturerID, -1, SQLITE_STATIC);
+						sqlite3_bind_text(stmt, 2, partIdChar, -1, SQLITE_STATIC);
+
+						// Execute the statement
+						rc = sqlite3_step(stmt);
+
+						// Finalize the statement
+						sqlite3_finalize(stmt);
+					}
+
+					break;
+				}
+				case 4: {
+					// === Update Ordered From ===
+					PrintTitle();
+					PrintBannerMessage("TIP: DO NOT INCLUDE SPACES IN INPUTS!");
+					PrintMessage("ENTER NEW SITE ORDERED FROM");
+
+					char partSite[20];
+
+					printf(" >> ");
+					scanf("%s", partSite);
+
+					// Get old site ordered from
+					const char* siteSQL = "SELECT partId, siteOrderedFrom "
+						"FROM partsInfo "
+						"WHERE partId = ?;";
+
+					// SQLite statement handle for executing the SELECT query
+					sqlite3_stmt* stmt;
+
+					// Prepare the SQL statement for execution
+					int rc = sqlite3_prepare_v2(db, siteSQL, -1, &stmt, 0);
+
+					// Bind the partId as a parameter
+					sqlite3_bind_text(stmt, 1, partIdChar, -1, SQLITE_STATIC);
+
+					char site[20] = "";
+
+					// Execute the statement
+					while (sqlite3_step(stmt) == SQLITE_ROW) {
+						// Fetch the values from the current row
+						const char* id = (const char*)sqlite3_column_text(stmt, 0);
+
+						// Check if the retrieved partId matches the entered one
+						if (strcmp(id, partIdChar) == 0) {
+							const char* retrievedSite = (const char*)sqlite3_column_text(stmt, 1);
+
+							// Copy the retrieved name to 'site'
+							strncpy(site, retrievedSite, 19);
+							site[19] = '\0';
+						}
+					}
+
+					// Finalize the statement
+					sqlite3_finalize(stmt);
+
+					// Ask user for confirmation
+					PrintUpdateConfirm("SITE ORDERED FROM", site, partSite);
+
+					printf(" CONFIRM (Y/N): ");
+
+					char input[2];
+					scanf("%s", input);
+
+					if (input[0] == 'y' || input[0] == 'Y') {
+						// SQL statement for updating siteOrderedFrom
+						const char* updateNameSQL = "UPDATE partsInfo "
+							"SET siteOrderedFrom = ?"
+							"WHERE partId = ?;";
+
+						// SQLite statement handle for executing the SELECT query
+						sqlite3_stmt* stmt;
+
+						// Prepare the SQL statement for execution
+						int rc = sqlite3_prepare_v2(db, updateNameSQL, -1, &stmt, 0);
+
+						// Bind the partId as a parameter
+						sqlite3_bind_text(stmt, 1, partSite, -1, SQLITE_STATIC);
+						sqlite3_bind_text(stmt, 2, partIdChar, -1, SQLITE_STATIC);
+
+						// Execute the statement
+						rc = sqlite3_step(stmt);
+
+						// Finalize the statement
+						sqlite3_finalize(stmt);
+					}
+
+					break;
+				}
+				case 5: {
+					// === Update Cost ===
+					PrintTitle();
+					PrintBannerMessage("TIP: DO NOT INCLUDE SPACES IN INPUTS!");
+					PrintMessage("ENTER NEW PART COST");
+
+					double partCost;
+
+					printf(" >> ");
+					scanf("%lf", &partCost);
+
+					// Get old part cost
+					const char* partCostSQL = "SELECT partId, partCost "
+						"FROM partsInfo "
+						"WHERE partId = ?;";
+
+					// SQLite statement handle for executing the SELECT query
+					sqlite3_stmt* stmt;
+
+					// Prepare the SQL statement for execution
+					int rc = sqlite3_prepare_v2(db, partCostSQL, -1, &stmt, 0);
+
+					// Bind the partId as a parameter
+					sqlite3_bind_text(stmt, 1, partIdChar, -1, SQLITE_STATIC);
+
+					char cost[20] = "";
+
+					// Execute the statement
+					while (sqlite3_step(stmt) == SQLITE_ROW) {
+						// Fetch the values from the current row
+						const char* id = (const char*)sqlite3_column_text(stmt, 0);
+
+						// Check if the retrieved partId matches the entered one
+						if (strcmp(id, partIdChar) == 0) {
+							double unitCost = sqlite3_column_double(stmt, 1);
+
+							// Copy the retrieved cost
+							sprintf(cost, "%.2f", unitCost);
+
+							printf("%.2f", unitCost);
+						}
+					}
+
+					// Finalize the statement
+					sqlite3_finalize(stmt);
+
+					char partCostChar[20] = "";
+
+					// Copy new cost to char
+					sprintf(partCostChar, "%.2f", partCost);
+
+					// Ask user for confirmation
+					PrintUpdateConfirm("PART COST", cost, partCostChar);
+
+					printf(" CONFIRM (Y/N): "); 
+					
+					char input[2];
+					scanf("%s", input);
+
+					if (input[0] == 'y' || input[0] == 'Y') {
+						// SQL statement for updating siteOrderedFrom
+						const char* partCostSQL = "UPDATE partsInfo "
+							"SET partCost = ?"
+							"WHERE partId = ?;";
+
+						// SQLite statement handle for executing the SELECT query
+						sqlite3_stmt* stmt;
+
+						// Prepare the SQL statement for execution
+						int rc = sqlite3_prepare_v2(db, partCostSQL, -1, &stmt, 0);
+
+						// Bind the partId as a parameter
+						sqlite3_bind_double(stmt, 1, partCost, -1, SQLITE_STATIC);
+						sqlite3_bind_text(stmt, 2, partIdChar, -1, SQLITE_STATIC);
+
+						// Execute the statement
+						rc = sqlite3_step(stmt);
+
+						// Finalize the statement
+						sqlite3_finalize(stmt);
+					}
+
+					break;
+				}
+				}
+
+				break;
+			}
+			case 2: {
+				// === Quantity ===
+				// Get update option
+				int input = -1;
+				do {
+					PrintTitle();
+
+					if ((input < 1 || input > 2) && input != -1) {
+						PrintBannerMessage("ERROR) INVALID OPTION!");
+					}
+
+					PrintUpdateQuantity();
+
+					printf(" >> ");
+					scanf("%d", &input);
+				} while (input < 1 || input > 2);
+
+				int qty = 0;
+
+				// Act on selected option
+				switch (input) {
+				case 1: 
+					PrintTitle();
+					PrintBannerMessage("ADD QUANTITY");
+					PrintMessage("ENTER QUANTITY AMOUNT");
+
+					printf(" >> ");
+					scanf("%d", &qty);
+
+					break;
+				case 2: 
+
+					PrintTitle();
+					PrintBannerMessage("REMOVE QUANTITY");
+					PrintMessage("ENTER QUANTITY AMOUNT");
+
+					printf(" >> ");
+					scanf("%d", &qty);
+
+					qty *= -1;
+
+					break;
+				}
+
+				// == Get current quantity ==
+				const char* getQuantitySQL = "SELECT partId, quantity "
+					"FROM parts "
+					"WHERE partId = ?;";
+
+				// SQLite statement handle for executing the SELECT query
+				sqlite3_stmt* stmt;
+
+				// Prepare the SQL statement for execution
+				int rc = sqlite3_prepare_v2(db, getQuantitySQL, -1, &stmt, 0);
+
+				// Bind the partId as a parameter
+				sqlite3_bind_text(stmt, 1, partIdChar, -1, SQLITE_STATIC);
+
+				int quantity = 0;
+				char quantityChar[20] = "";
+
+				// Execute the statement
+				while (sqlite3_step(stmt) == SQLITE_ROW) {
+					// Fetch the values from the current row
+					const char* id = (const char*)sqlite3_column_text(stmt, 0);
+
+					// Check if the retrieved partId matches the entered one
+					if (strcmp(id, partIdChar) == 0) {
+						quantity= sqlite3_column_int(stmt, 1);
+
+						// Copy the retrieved cost
+						sprintf(quantityChar, "%d", quantity);
+					}
+				}
+
+				qty += quantity;
+
+				char qtyChar[20] = "";
+				sprintf(qtyChar, "%d", qty);
+
+				// Finalize the statement
+				sqlite3_finalize(stmt);
+
+				PrintUpdateConfirm("QUANTITY", quantityChar, qtyChar);
+
+				char userInput[2];
+				printf(" CONFIRM (Y/N): ");
+				scanf("%s", userInput);
+
+				// == Update quantity ==
+				if (userInput[0] == 'y' || userInput[0] == 'Y') {
+					// SQL statement for updating quantity
+					const char* updateQuantitySQL = "UPDATE parts "
+						"SET quantity = ? "
+						"WHERE partId = ?;";
+
+					// SQLite statement handle for executing the SELECT query
+					sqlite3_stmt* updateStmt;
+
+					// Prepare the SQL statement for execution
+					rc = sqlite3_prepare_v2(db, updateQuantitySQL, -1, &updateStmt, 0);
+
+					// Bind the partId as a parameter
+					sqlite3_bind_int(updateStmt, 1, qty);
+					sqlite3_bind_text(updateStmt, 2, partIdChar, -1, SQLITE_STATIC);
+
+					// Execute the statement
+					rc = sqlite3_step(updateStmt);
+
+					// Finalize the statement
+					sqlite3_finalize(updateStmt);
+				}
+			}
+			}
+
+			error = 0;
+
 			break;
+		}
 		case 3: {
 			// === Add Part ===
 			char partId[7];
@@ -191,7 +791,7 @@ int main() {
 			scanf("%s", manufacturerNumber);
 			printf("   Enter Site Ordered From: ");
 			scanf("%s", siteOrderedFrom);
-			printf("   Enter Part Cost: ");
+			printf("   Enter Part Cost: $");
 			scanf("%lf", &partCost);
 
 			// SQL statement for inserting data into partsInfo table
@@ -385,9 +985,6 @@ int main() {
 
 			break;
 		}
-		case 6:
-			// === Generate Report === 
-			break;
 		case 9:
 			done = 1;
 
