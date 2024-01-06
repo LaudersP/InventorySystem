@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\Users\Parker Lauders\Desktop\Engineering Projects\InventorySystem\bin\visual_studio2022\Debug\Application.exe</FullPath>
+      <FullPath>C:\Users\Parker Lauders\Desktop\Engineering Projects\InventorySystem\bin\visual_studio2022\Release\Application.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />
