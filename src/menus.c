@@ -80,10 +80,6 @@ void PrintMainMenu() {
 
 	FinishLine(79);
 
-	printf("%c   (6) GENERATE REPORT", 179);
-
-	FinishLine(79);
-
 	printf("%c   (9) EXIT           ", 179);
 
 	FinishLine(79);
@@ -229,13 +225,13 @@ void PrintPartInfo(const char* id, const char* name, const char* man, const char
 	FinishLine(88 - (int)strlen(qtyChar));
 
 	sprintf_s(unitCostChar, sizeof(unitCostChar), "%.2f", fabs(unitCost));
-	printf("%c   PART COST: %s", 179, unitCostChar);
-	FinishLine(88 - (int)strlen(unitCostChar) - 1);
+	printf("%c   PART COST: $%s", 179, unitCostChar);
+	FinishLine(87 - (int)strlen(unitCostChar) - 1);
 
 	double partValue = qty * unitCost;
 	sprintf_s(partValueChar, sizeof(partValueChar), "%.2f", fabs(partValue));
-	printf("%c   PART VALUE: %s", 179, partValueChar);
-	FinishLine(87 - (int)strlen(partValueChar) - 1);
+	printf("%c   PART VALUE: $%s", 179, partValueChar);
+	FinishLine(86 - (int)strlen(partValueChar) - 1);
 
 	FillerLine();
 
@@ -250,6 +246,73 @@ void PrintPartInfo(const char* id, const char* name, const char* man, const char
 			printf("%c", 196);
 		}
 	}
+}
+
+void PrintUpdateMenu() {
+	FillerLine();
+
+	printf("%c   (1) PART INFO", 179);
+	FinishLine(85);
+
+	printf("%c   (2) QUANTITY", 179);
+	FinishLine(86);
+
+	FillerLine();
+
+	GraphicBottom();
+}
+
+void PrintUpdatePartInfoMenu() {
+	FillerLine();
+
+	printf("%c   (1) PART NAME", 179);
+	FinishLine(85);
+
+	printf("%c   (2) MANUFACTURER", 179);
+	FinishLine(82);
+
+	printf("%c   (3) MANUFACTURER ID", 179);
+	FinishLine(79);
+
+	printf("%c   (4) ORDERED FROM", 179);
+	FinishLine(82);
+
+	printf("%c   (5) COST", 179);
+	FinishLine(90);
+
+	FillerLine();
+
+	GraphicBottom();
+}
+
+void PrintUpdateConfirm(const char* infoBeingUpdated, const char* oldInfo, const char* newInfo) {
+	PrintTitle();
+	PrintBannerMessage("CONFIRM PART EDIT!");
+
+	FillerLine();
+
+	printf("%c   UPDATE %s: %s -> %s", 179, infoBeingUpdated, oldInfo, newInfo);
+
+	FinishLine(85 - (int)strlen(infoBeingUpdated) - (int)strlen(oldInfo) - (int)strlen(newInfo));
+
+	FillerLine();
+	GraphicBottom();
+}
+
+void PrintUpdateQuantity() {
+	PrintBannerMessage("PART QUANTITY UPDATE");
+	FillerLine();
+
+	printf("%c   1) ADD QUANTITY", 179);
+	FinishLine(83);
+
+	printf("%c   2) REMOVE QUANTITY", 179);
+	FinishLine(80);
+
+	FillerLine();
+
+	GraphicBottom();
+
 }
 
 // === Sub Called Functions ===

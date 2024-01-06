@@ -15,6 +15,10 @@ void PrintBannerMessage(const char* bannerMessage);
 void PrintMessage(const char* inputMessage);
 void PrintInventory(const char* id, const char* name, const int qty);
 void PrintPartInfo(const char* id, const char* name, const char* man, const char* manNum, const char* site, const int qty, const double unitCost);
+void PrintUpdateMenu();
+void PrintUpdatePartInfoMenu();
+void PrintUpdateConfirm(const char* infoBeingUpdated, const char* oldInfo, const char* newInfo);
+void PrintUpdateQuantity();
 
 // === Sub Called Functions ===
 void FillerLine();
