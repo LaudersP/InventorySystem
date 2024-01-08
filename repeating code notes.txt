@@ -1,0 +1,51 @@
+Lines: 229, 385, 463, 541, 662, 
+
+------------------------------------------------------------------------------------------
+SELECT partId, ?
+FROM ?
+WHERE partId = ?
+------------------------------------------------------------------------------------------
+char selectSQL(const char* desiredSelect, const char* table, const char* partId) {
+	const char* selectSQL = "SELECT partId, ? "
+		"FROM ? "
+		"WHERE partId = ?;";
+
+	// SQLite statement handeling for executing the SELECT query
+	sqlite3_stmt* stmt;
+
+	// Prepare the SQL statement for execution
+	int rc = sqlite3_prepare_v2(db, nameSQL, -1, &stmt, 0);
+
+	// Bind 'desiredSelect' to statment
+	sqlite3_bind_text(stmt, 1, desiredSelect, -1, SQLITE_STATIC);
+
+	// Bind 'table' to statment
+	sqlite3_bind_text(stmt, 1, table, -1, SQLITE_STATIC);
+
+	// Bind 'partId' to statment
+	sqlite3_bind_text(stmt, 1, partId, -1, SQLITE_STATIC);
+
+	char data[20] = "";
+
+	// Execute the SQL statement
+	while(sqlite3_step(stmt) == SQLITE_ROW) {
+		// Get the value 'partId' of the current row
+		const char* partIdPulled = (const char*)sqlite3_column_text(stmt, 0);
+		
+		// Check that partId's matches
+		if(strcmp(partIdPulled, partId) == 0) {
+			// Get the value of 'desiredSelect' of the current row
+			const char* desiredSelectPulled = (const char*)sqlite3_column_text(stmt, 1);
+
+			// Copy the retrieved data to 'data'
+			strncpy(data, desiredSelectPulled, 19);
+			data[19] = "\0";
+		}
+	}
+
+	// Finalize the statement
+	sqlite3_finalize(stmt);
+
+	// Return selected data
+	return data;
+}
