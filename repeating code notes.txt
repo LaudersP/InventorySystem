@@ -1,23 +1,24 @@
 Lines: 229, 385, 463, 541, 662, 
 
 ------------------------------------------------------------------------------------------
-SELECT partId, ?
-FROM ?
-WHERE partId = ?
+SELECT partId, <attribute>
+FROM <table>
+WHERE partId = <partId>;
 ------------------------------------------------------------------------------------------
-char selectSQL(const char* desiredSelect, const char* table, const char* partId) {
-	const char* selectSQL = "SELECT partId, ? "
+// FunctionSQL statement for selection
+char SelectSQL(const char* table, const char* partId, const char* attribute) {
+	const char* SQLQuery = "SELECT partId, ? "
 		"FROM ? "
 		"WHERE partId = ?;";
 
 	// SQLite statement handeling for executing the SELECT query
 	sqlite3_stmt* stmt;
 
-	// Prepare the SQL statement for execution
-	int rc = sqlite3_prepare_v2(db, nameSQL, -1, &stmt, 0);
+	// Prepare the SQL query for execution
+	int rc = sqlite3_prepare_v2(db, SQLQuery, -1, &stmt, 0);
 
 	// Bind 'desiredSelect' to statment
-	sqlite3_bind_text(stmt, 1, desiredSelect, -1, SQLITE_STATIC);
+	sqlite3_bind_text(stmt, 1, attribute, -1, SQLITE_STATIC);
 
 	// Bind 'table' to statment
 	sqlite3_bind_text(stmt, 1, table, -1, SQLITE_STATIC);
@@ -34,11 +35,11 @@ char selectSQL(const char* desiredSelect, const char* table, const char* partId)
 		
 		// Check that partId's matches
 		if(strcmp(partIdPulled, partId) == 0) {
-			// Get the value of 'desiredSelect' of the current row
-			const char* desiredSelectPulled = (const char*)sqlite3_column_text(stmt, 1);
+			// Get the value of 'attribute' of the current row
+			const char* attributeData = (const char*)sqlite3_column_text(stmt, 1);
 
 			// Copy the retrieved data to 'data'
-			strncpy(data, desiredSelectPulled, 19);
+			strncpy(data, attributeData, 19);
 			data[19] = "\0";
 		}
 	}
@@ -48,4 +49,43 @@ char selectSQL(const char* desiredSelect, const char* table, const char* partId)
 
 	// Return selected data
 	return data;
+}
+
+======================================================================================================
+Lines: 272, 350, 428, 506, 590, 709
+
+------------------------------------------------------------------------------------------
+UPDATE <table>
+SET <attribute> = <newAttributeData>
+WHERE partId = <partId>;
+------------------------------------------------------------------------------------------
+// SQL statment for updating text entries in tables
+char UpdateTextItemSQL(const char* table, const char* partId, const char* attribute, const char* newAttributeData) {
+	const char* SQLQuery = "UPDATE ? "
+		"SET ? = ? "
+		"WHERE partId = ?;";
+
+	// SQlite statment for execution
+	sqlite3_stmt* stmt;
+
+	// Prepare the SQL query for execution
+	int rc = sqlite3_prepare_v2(db, SQLQuery, -1, &stmt, 0);
+
+	// Bind 'table' to statment
+	sqlite3_bind_text(stmt, 1, table, -1, SQLITE_STATIC);
+
+	// Bind 'attribute' to statment
+	sqlite3_bind_text(stmt, 2, attribute, -1, SQLITE_STATIC);
+
+	// Bind 'newAttributeData' to statment
+	sqlite3_bind_text(stmt, 3, newAttributeData, -1, SQLITE_STATIC);
+
+	// Bind 'partId' to statment
+	sqlite3_bind_text(stmt, 4, partId, -1, SQLITE_STATIC);
+
+	// Execute the statement
+	rc = sqlite3_step(stmt);
+
+	// Finalize the statement
+	sqlite3_finalize(stmt);
 }
