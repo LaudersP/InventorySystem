@@ -82,6 +82,6 @@ Contributions are welcome! If you have any suggestions, improvements, or bug fix
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [GNU General Public License (GPL)](LICENSE).
 
 Happy managing your workshop parts!
