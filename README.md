@@ -53,16 +53,14 @@ Welcome to the Workshop Part Inventory System! This system is designed to help y
   - Part Name
   - Part Cost
 
-#### Advantages of Local Database
-
-    - **Locally held database on the user computer!**
-      - Your inventory data is stored on your computer, ensuring data privacy and control.
-
-    - **No worries about hosting a server for your inventory system!**
-      - No need to set up and maintain a separate server for hosting the database.
-
-    - **No security fear hosting on a server with a public network IP address!**
-      - Eliminate security concerns associated with hosting on a server with public network exposure.
+## Advantages of Local Database
+ 
+- **No worries about server setup or maintenance!**
+  - No need to set up and maintain a separate server for hosting the database.
+  - Just download and run!
+  
+- **No security fears!**
+  -Eliminates security concerns by removing the need to host your database on a server with public network exposure. 
 
 ## Getting Started
 
