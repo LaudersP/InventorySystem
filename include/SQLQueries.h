@@ -11,5 +11,9 @@
 void SelectTextSQL(sqlite3* database, const char* table, const char* partId, const char* attribute, int resultSize, char* result);
 void SelectDoubleSQL(sqlite3* database, const char* table, const char* partId, const char* attribute, double* result);
 void SelectIntSQL(sqlite3* database, const char* table, const char* partId, const char* attribute, int* result);
+void UpdateTextSQL(sqlite3* database, const char* table, const char* partId, const char* attribute, const char* newAttributeData);
+void UpdateDoubleSQL(sqlite3* database, const char* table, const char* partId, const char* attribute, double newAttributeData);
+void UpdateIntSQL(sqlite3* database, const char* table, const char* partId, const char* attribute, int newAttributeData);
+void DeleteSQL(sqlite3* database, const char* table, const char* partId);
 
 #endif
