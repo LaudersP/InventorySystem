@@ -60,14 +60,14 @@ Welcome to the Workshop Part Inventory System! This system is designed to help y
   - Just download and run!
   
 - **No security fears!**
-  -Eliminates security concerns by removing the need to host your database on a server with public network exposure. 
+  - Eliminates security concerns by removing the need to host your database on a server with public network exposure. 
 
 ## Getting Started
 
 To get started with the Workshop Part Inventory System, follow these steps:
 
 1. Clone the repository to your local machine.
-2. Setup a shortcute for the Application.exe file
+2. Setup a shortcut for the Application.exe file
    - This is found in InventorySystem\bin\visual_studio2022\Release\
 4. Run the application.
 
