@@ -85,11 +85,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>..\..\bin\visual_studio2022\$(Configuration)\</OutDir>
-    <IntDir>..\..\temp\visual_studio2022\%(Configuration)\</IntDir>
+    <IntDir>..\..\temp\visual_studio2022\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\..\bin\visual_studio2022\$(Configuration)\</OutDir>
-    <IntDir>..\..\temp\visual_studio2022\%(Configuration)\</IntDir>
+    <IntDir>..\..\temp\visual_studio2022\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
