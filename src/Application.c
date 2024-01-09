@@ -5,6 +5,7 @@
 #include <string.h>
 #include <sqlite-amalgamation-3440200\sqlite3.h>
 #include <menus.h>
+#include <SQLQueries.h>
 
 #define DATABASE_FILE_PATH "InventorySystem.db"
 
@@ -210,7 +211,7 @@ int main() {
 
 					printf(" >> ");
 					scanf("%d", &input);
-				} while (input < 1 || input > 2);
+				} while (input < 1 || input > 5);
 
 				// Act on option
 				switch (input) {
@@ -225,39 +226,12 @@ int main() {
 					printf(" >> ");
 					scanf("%s", partName);
 
-					// Get old part name
-					const char* nameSQL = "SELECT partId, partName "
-						"FROM parts "
-						"WHERE partId = ?;";
-
-					// SQLite statement handle for executing the SELECT query
-					sqlite3_stmt* stmt;
-
-					// Prepare the SQL statement for execution
-					int rc = sqlite3_prepare_v2(db, nameSQL, -1, &stmt, 0);
-
-					// Bind the partId as a parameter
-					sqlite3_bind_text(stmt, 1, partIdChar, -1, SQLITE_STATIC);
-
 					char name[20] = "";
+					const char* tableName = "parts";
+					const char* targetPartId = partIdChar;
+					const char* attributeName = "partName";
 
-					// Execute the statement
-					while (sqlite3_step(stmt) == SQLITE_ROW) {
-						// Fetch the values from the current row
-						const char* id = (const char*)sqlite3_column_text(stmt, 0);
-
-						// Check if the retrieved partId matches the entered one
-						if (strcmp(id, partIdChar) == 0) {
-							const char* retrievedName = (const char*)sqlite3_column_text(stmt, 1);
-
-							// Copy the retrieved name to 'name'
-							strncpy(name, retrievedName, 19);
-							name[19] = '\0';
-						}
-					}
-
-					// Finalize the statement
-					sqlite3_finalize(stmt);
+					SelectTextSQL(db, tableName, targetPartId, attributeName, sizeof(name), name);
 
 					// Ask user for confirmation
 					PrintUpdateConfirm("PART NAME", name, partName);
@@ -268,26 +242,11 @@ int main() {
 					scanf("%s", input);
 
 					if (input[0] == 'y' || input[0] == 'Y') {
-						// SQL statement for updating partName
-						const char* updateNameSQL = "UPDATE parts "
-							"SET partName = ?"
-							"WHERE partId = ?;";
+						const char* tableName = "parts";
+						const char* targetPartId = partIdChar;
+						const char* attributeName = "partName";
 
-						// SQLite statement handle for executing the SELECT query
-						sqlite3_stmt* stmt;
-
-						// Prepare the SQL statement for execution
-						int rc = sqlite3_prepare_v2(db, updateNameSQL, -1, &stmt, 0);
-
-						// Bind the partId as a parameter
-						sqlite3_bind_text(stmt, 1, partName, -1, SQLITE_STATIC);
-						sqlite3_bind_text(stmt, 2, partIdChar, -1, SQLITE_STATIC);
-
-						// Execute the statement
-						rc = sqlite3_step(stmt);
-
-						// Finalize the statement
-						sqlite3_finalize(stmt);
+						UpdateTextSQL(db, tableName, targetPartId, attributeName, partName);
 					}
 
 					break;
@@ -303,39 +262,12 @@ int main() {
 					printf(" >> ");
 					scanf("%s", partManufacturer);
 
-					// Get old part manufacturer
-					const char* manufacturerSQL = "SELECT partId, manufacturer "
-						"FROM partsInfo "
-						"WHERE partId = ?;";
-
-					// SQLite statement handle for executing the SELECT query
-					sqlite3_stmt* stmt;
-
-					// Prepare the SQL statement for execution
-					int rc = sqlite3_prepare_v2(db, manufacturerSQL, -1, &stmt, 0);
-
-					// Bind the partId as a parameter
-					sqlite3_bind_text(stmt, 1, partIdChar, -1, SQLITE_STATIC);
-
 					char manufacturer[20] = "";
+					const char* tableName = "partsInfo";
+					const char* targetPartId = partIdChar;
+					const char* attributeName = "manufacturer";
 
-					// Execute the statement
-					while (sqlite3_step(stmt) == SQLITE_ROW) {
-						// Fetch the values from the current row
-						const char* id = (const char*)sqlite3_column_text(stmt, 0);
-
-						// Check if the retrieved partId matches the entered one
-						if (strcmp(id, partIdChar) == 0) {
-							const char* retrievedManufacturer = (const char*)sqlite3_column_text(stmt, 1);
-
-							// Copy the retrieved name to 'manufacturer'
-							strncpy(manufacturer, retrievedManufacturer, 19);
-							manufacturer[19] = '\0';
-						}
-					}
-
-					// Finalize the statement
-					sqlite3_finalize(stmt);
+					SelectTextSQL(db, tableName, targetPartId, attributeName, sizeof(manufacturer), manufacturer);
 
 					// Ask user for confirmation
 					PrintUpdateConfirm("MANUFACTURER", manufacturer, partManufacturer);
@@ -346,26 +278,11 @@ int main() {
 					scanf("%s", input);
 
 					if (input[0] == 'y' || input[0] == 'Y') {
-						// SQL statement for updating manufacturer
-						const char* updateNameSQL = "UPDATE partsInfo "
-							"SET manufacturer = ?"
-							"WHERE partId = ?;";
+						const char* tableName = "partsInfo";
+						const char* targetPartId = partIdChar;
+						const char* attributeName = "manufacturer";
 
-						// SQLite statement handle for executing the SELECT query
-						sqlite3_stmt* stmt;
-
-						// Prepare the SQL statement for execution
-						int rc = sqlite3_prepare_v2(db, updateNameSQL, -1, &stmt, 0);
-
-						// Bind the partId as a parameter
-						sqlite3_bind_text(stmt, 1, partManufacturer, -1, SQLITE_STATIC);
-						sqlite3_bind_text(stmt, 2, partIdChar, -1, SQLITE_STATIC);
-
-						// Execute the statement
-						rc = sqlite3_step(stmt);
-
-						// Finalize the statement
-						sqlite3_finalize(stmt);
+						UpdateTextSQL(db, tableName, targetPartId, attributeName, partManufacturer);
 					}
 
 					break;
@@ -380,40 +297,13 @@ int main() {
 
 					printf(" >> ");
 					scanf("%s", partManufacturerID);
-
-					// Get old part manufacturer ID
-					const char* manufacturerIdSQL = "SELECT partId, manufacturerNumber "
-						"FROM partsInfo "
-						"WHERE partId = ?;";
-
-					// SQLite statement handle for executing the SELECT query
-					sqlite3_stmt* stmt;
-
-					// Prepare the SQL statement for execution
-					int rc = sqlite3_prepare_v2(db, manufacturerIdSQL, -1, &stmt, 0);
-
-					// Bind the partId as a parameter
-					sqlite3_bind_text(stmt, 1, partIdChar, -1, SQLITE_STATIC);
-
+					
 					char manufacturerId[20] = "";
+					const char* tableName = "partsInfo";
+					const char* targetPartId = partIdChar;
+					const char* attributeName = "manufacturerNumber";
 
-					// Execute the statement
-					while (sqlite3_step(stmt) == SQLITE_ROW) {
-						// Fetch the values from the current row
-						const char* id = (const char*)sqlite3_column_text(stmt, 0);
-
-						// Check if the retrieved partId matches the entered one
-						if (strcmp(id, partIdChar) == 0) {
-							const char* retrievedManufacturerId = (const char*)sqlite3_column_text(stmt, 1);
-
-							// Copy the retrieved name to 'manufacturerId'
-							strncpy(manufacturerId, retrievedManufacturerId, 19);
-							manufacturerId[19] = '\0';
-						}
-					}
-
-					// Finalize the statement
-					sqlite3_finalize(stmt);
+					SelectTextSQL(db, tableName, targetPartId, attributeName, sizeof(manufacturerId), manufacturerId);
 
 					// Ask user for confirmation
 					PrintUpdateConfirm("MANUFACTURER ID", manufacturerId, partManufacturerID);
@@ -424,26 +314,11 @@ int main() {
 					scanf("%s", input);
 
 					if (input[0] == 'y' || input[0] == 'Y') {
-						// SQL statement for updating manufacturerNumber
-						const char* updateNameSQL = "UPDATE partsInfo "
-							"SET manufacturerNumber = ?"
-							"WHERE partId = ?;";
+						const char* tableName = "partsInfo";
+						const char* targetPartId = partIdChar;
+						const char* attributeName = "manufacturerNumber";
 
-						// SQLite statement handle for executing the SELECT query
-						sqlite3_stmt* stmt;
-
-						// Prepare the SQL statement for execution
-						int rc = sqlite3_prepare_v2(db, updateNameSQL, -1, &stmt, 0);
-
-						// Bind the partId as a parameter
-						sqlite3_bind_text(stmt, 1, partManufacturerID, -1, SQLITE_STATIC);
-						sqlite3_bind_text(stmt, 2, partIdChar, -1, SQLITE_STATIC);
-
-						// Execute the statement
-						rc = sqlite3_step(stmt);
-
-						// Finalize the statement
-						sqlite3_finalize(stmt);
+						UpdateTextSQL(db, tableName, targetPartId, attributeName, partManufacturerID);
 					}
 
 					break;
@@ -458,43 +333,16 @@ int main() {
 
 					printf(" >> ");
 					scanf("%s", partSite);
+					
+					char siteOrderedFrom[20] = "";
+					const char* tableName = "partsInfo";
+					const char* targetPartId = partIdChar;
+					const char* attributeName = "siteOrderedFrom";
 
-					// Get old site ordered from
-					const char* siteSQL = "SELECT partId, siteOrderedFrom "
-						"FROM partsInfo "
-						"WHERE partId = ?;";
-
-					// SQLite statement handle for executing the SELECT query
-					sqlite3_stmt* stmt;
-
-					// Prepare the SQL statement for execution
-					int rc = sqlite3_prepare_v2(db, siteSQL, -1, &stmt, 0);
-
-					// Bind the partId as a parameter
-					sqlite3_bind_text(stmt, 1, partIdChar, -1, SQLITE_STATIC);
-
-					char site[20] = "";
-
-					// Execute the statement
-					while (sqlite3_step(stmt) == SQLITE_ROW) {
-						// Fetch the values from the current row
-						const char* id = (const char*)sqlite3_column_text(stmt, 0);
-
-						// Check if the retrieved partId matches the entered one
-						if (strcmp(id, partIdChar) == 0) {
-							const char* retrievedSite = (const char*)sqlite3_column_text(stmt, 1);
-
-							// Copy the retrieved name to 'site'
-							strncpy(site, retrievedSite, 19);
-							site[19] = '\0';
-						}
-					}
-
-					// Finalize the statement
-					sqlite3_finalize(stmt);
+					SelectTextSQL(db, tableName, targetPartId, attributeName, sizeof(siteOrderedFrom), siteOrderedFrom);
 
 					// Ask user for confirmation
-					PrintUpdateConfirm("SITE ORDERED FROM", site, partSite);
+					PrintUpdateConfirm("SITE ORDERED FROM", siteOrderedFrom, partSite);
 
 					printf(" CONFIRM (Y/N): ");
 
@@ -502,26 +350,11 @@ int main() {
 					scanf("%s", input);
 
 					if (input[0] == 'y' || input[0] == 'Y') {
-						// SQL statement for updating siteOrderedFrom
-						const char* updateNameSQL = "UPDATE partsInfo "
-							"SET siteOrderedFrom = ?"
-							"WHERE partId = ?;";
+						const char* tableName = "partsInfo";
+						const char* targetPartId = partIdChar;
+						const char* attributeName = "siteOrderedFrom";
 
-						// SQLite statement handle for executing the SELECT query
-						sqlite3_stmt* stmt;
-
-						// Prepare the SQL statement for execution
-						int rc = sqlite3_prepare_v2(db, updateNameSQL, -1, &stmt, 0);
-
-						// Bind the partId as a parameter
-						sqlite3_bind_text(stmt, 1, partSite, -1, SQLITE_STATIC);
-						sqlite3_bind_text(stmt, 2, partIdChar, -1, SQLITE_STATIC);
-
-						// Execute the statement
-						rc = sqlite3_step(stmt);
-
-						// Finalize the statement
-						sqlite3_finalize(stmt);
+						UpdateTextSQL(db, tableName, targetPartId, attributeName, partSite);
 					}
 
 					break;
@@ -536,41 +369,18 @@ int main() {
 
 					printf(" >> ");
 					scanf("%lf", &partCost);
+					
+					double result = 0.0;
+					const char* tableName = "partsInfo";
+					const char* targetPartId = partIdChar;
+					const char* attributeName = "partCost";
 
-					// Get old part cost
-					const char* partCostSQL = "SELECT partId, partCost "
-						"FROM partsInfo "
-						"WHERE partId = ?;";
+					SelectDoubleSQL(db, tableName, targetPartId, attributeName, &result);
 
-					// SQLite statement handle for executing the SELECT query
-					sqlite3_stmt* stmt;
+					char resultChar[20] = "";
 
-					// Prepare the SQL statement for execution
-					int rc = sqlite3_prepare_v2(db, partCostSQL, -1, &stmt, 0);
-
-					// Bind the partId as a parameter
-					sqlite3_bind_text(stmt, 1, partIdChar, -1, SQLITE_STATIC);
-
-					char cost[20] = "";
-
-					// Execute the statement
-					while (sqlite3_step(stmt) == SQLITE_ROW) {
-						// Fetch the values from the current row
-						const char* id = (const char*)sqlite3_column_text(stmt, 0);
-
-						// Check if the retrieved partId matches the entered one
-						if (strcmp(id, partIdChar) == 0) {
-							double unitCost = sqlite3_column_double(stmt, 1);
-
-							// Copy the retrieved cost
-							sprintf(cost, "%.2f", unitCost);
-
-							printf("%.2f", unitCost);
-						}
-					}
-
-					// Finalize the statement
-					sqlite3_finalize(stmt);
+					// Copy new result to char
+					sprintf(resultChar, "%.2f", result);
 
 					char partCostChar[20] = "";
 
@@ -578,7 +388,7 @@ int main() {
 					sprintf(partCostChar, "%.2f", partCost);
 
 					// Ask user for confirmation
-					PrintUpdateConfirm("PART COST", cost, partCostChar);
+					PrintUpdateConfirm("PART COST", resultChar, partCostChar);
 
 					printf(" CONFIRM (Y/N): "); 
 					
@@ -586,26 +396,11 @@ int main() {
 					scanf("%s", input);
 
 					if (input[0] == 'y' || input[0] == 'Y') {
-						// SQL statement for updating siteOrderedFrom
-						const char* partCostSQL = "UPDATE partsInfo "
-							"SET partCost = ?"
-							"WHERE partId = ?;";
+						const char* tableName = "partsInfo";
+						const char* targetPartId = partIdChar;
+						const char* attributeName = "partCost";
 
-						// SQLite statement handle for executing the SELECT query
-						sqlite3_stmt* stmt;
-
-						// Prepare the SQL statement for execution
-						int rc = sqlite3_prepare_v2(db, partCostSQL, -1, &stmt, 0);
-
-						// Bind the partId as a parameter
-						sqlite3_bind_double(stmt, 1, partCost, -1, SQLITE_STATIC);
-						sqlite3_bind_text(stmt, 2, partIdChar, -1, SQLITE_STATIC);
-
-						// Execute the statement
-						rc = sqlite3_step(stmt);
-
-						// Finalize the statement
-						sqlite3_finalize(stmt);
+						UpdateDoubleSQL(db, tableName, targetPartId, attributeName, partCost);
 					}
 
 					break;
@@ -657,45 +452,21 @@ int main() {
 
 					break;
 				}
+					
+				int result = 0;
+				const char* tableName = "parts";
+				const char* targetPartId = partIdChar;
+				const char* attributeName = "quantity";
 
-				// == Get current quantity ==
-				const char* getQuantitySQL = "SELECT partId, quantity "
-					"FROM parts "
-					"WHERE partId = ?;";
+				SelectIntSQL(db, tableName, targetPartId, attributeName, &result);
 
-				// SQLite statement handle for executing the SELECT query
-				sqlite3_stmt* stmt;
-
-				// Prepare the SQL statement for execution
-				int rc = sqlite3_prepare_v2(db, getQuantitySQL, -1, &stmt, 0);
-
-				// Bind the partId as a parameter
-				sqlite3_bind_text(stmt, 1, partIdChar, -1, SQLITE_STATIC);
-
-				int quantity = 0;
 				char quantityChar[20] = "";
+				sprintf(quantityChar, "%d", result);
 
-				// Execute the statement
-				while (sqlite3_step(stmt) == SQLITE_ROW) {
-					// Fetch the values from the current row
-					const char* id = (const char*)sqlite3_column_text(stmt, 0);
-
-					// Check if the retrieved partId matches the entered one
-					if (strcmp(id, partIdChar) == 0) {
-						quantity= sqlite3_column_int(stmt, 1);
-
-						// Copy the retrieved cost
-						sprintf(quantityChar, "%d", quantity);
-					}
-				}
-
-				qty += quantity;
+				qty += result;
 
 				char qtyChar[20] = "";
 				sprintf(qtyChar, "%d", qty);
-
-				// Finalize the statement
-				sqlite3_finalize(stmt);
 
 				PrintUpdateConfirm("QUANTITY", quantityChar, qtyChar);
 
@@ -705,26 +476,11 @@ int main() {
 
 				// == Update quantity ==
 				if (userInput[0] == 'y' || userInput[0] == 'Y') {
-					// SQL statement for updating quantity
-					const char* updateQuantitySQL = "UPDATE parts "
-						"SET quantity = ? "
-						"WHERE partId = ?;";
+					const char* tableName = "parts";
+					const char* targetPartId = partIdChar;
+					const char* attributeName = "quantity";
 
-					// SQLite statement handle for executing the SELECT query
-					sqlite3_stmt* updateStmt;
-
-					// Prepare the SQL statement for execution
-					rc = sqlite3_prepare_v2(db, updateQuantitySQL, -1, &updateStmt, 0);
-
-					// Bind the partId as a parameter
-					sqlite3_bind_int(updateStmt, 1, qty);
-					sqlite3_bind_text(updateStmt, 2, partIdChar, -1, SQLITE_STATIC);
-
-					// Execute the statement
-					rc = sqlite3_step(updateStmt);
-
-					// Finalize the statement
-					sqlite3_finalize(updateStmt);
+					UpdateIntSQL(db, tableName, targetPartId, attributeName, qty);
 				}
 			}
 			}
@@ -896,41 +652,13 @@ int main() {
 				break;
 			}
 
-			// SQL statement to remove desired part from parts
-			const char* removePart = "DELETE FROM parts "
-				"WHERE partId = ?;";
+			const char* tableName = "parts";
+			
+			DeleteSQL(db, tableName, partId);
 
-			// SQL statement to remove desired part from partInfo
-			const char* removePartInfo = "DELETE FROM partsInfo "
-				"WHERE partId = ?;";
+			tableName = "partsInfo";
 
-			// SQLite statement handle for executing the REMOVE query
-			sqlite3_stmt* stmtPart;
-			sqlite3_stmt* stmtPartInfo;
-
-			// Prepare the SQL statement for execution
-			rc = sqlite3_prepare_v2(db, removePart, -1, &stmtPart, 0);
-
-			// Bind the partId as a parameter
-			sqlite3_bind_text(stmtPart, 1, partId, -1, SQLITE_STATIC);
-
-			// Execute the statement
-			rc = sqlite3_step(stmtPart);
-
-			// Finalize the statement
-			sqlite3_finalize(stmtPart);
-
-			// Prepare the SQL statement for execution
-			rc = sqlite3_prepare_v2(db, removePartInfo, -1, &stmtPartInfo, 0);
-
-			// Bind the partId as a parameter
-			sqlite3_bind_text(stmtPartInfo, 1, partId, -1, SQLITE_STATIC);
-
-			// Execute the statement
-			rc = sqlite3_step(stmtPart);
-
-			// Finalize the statement
-			sqlite3_finalize(stmtPartInfo);
+			DeleteSQL(db, tableName, partId);
 
 			error = 0;
 

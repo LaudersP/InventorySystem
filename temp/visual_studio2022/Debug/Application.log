@@ -1,0 +1,16 @@
+﻿  shell.c
+  sqlite3.c
+  Application.c
+  menus.c
+  SQLQueries.c
+C:\Users\Parker Lauders\Desktop\Engineering Projects\InventorySystem\src\SQLQueries.c(10,70): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Parker Lauders\Desktop\Engineering Projects\InventorySystem\src\SQLQueries.c(54,70): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Parker Lauders\Desktop\Engineering Projects\InventorySystem\src\SQLQueries.c(94,70): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Parker Lauders\Desktop\Engineering Projects\InventorySystem\src\SQLQueries.c(134,70): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Parker Lauders\Desktop\Engineering Projects\InventorySystem\src\SQLQueries.c(180,50): warning C4020: 'sqlite3_bind_double': too many actual parameters
+C:\Users\Parker Lauders\Desktop\Engineering Projects\InventorySystem\src\SQLQueries.c(167,70): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Parker Lauders\Desktop\Engineering Projects\InventorySystem\src\SQLQueries.c(200,70): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Parker Lauders\Desktop\Engineering Projects\InventorySystem\src\SQLQueries.c(232,50): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  Generating Code...
+LINK : warning LNK4067: ambiguous entry point; selected 'mainCRTStartup'
+  Application.vcxproj -> C:\Users\Parker Lauders\Desktop\Engineering Projects\InventorySystem\bin\visual_studio2022\Debug\Application.exe
